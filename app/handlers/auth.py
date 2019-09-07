@@ -377,7 +377,6 @@ class RecoveryPassword(BaseHandler):
             password = self.input_data['password']
             ouser = yield self.Users.find_one({'email': email})
             if ouser:
-                info(ouser)
                 # try:
                 if True:
                     user_id = str(ouser['_id'])
@@ -389,13 +388,16 @@ class RecoveryPassword(BaseHandler):
                             'token': gen_token(6), 'key': hashkey}
                     utoken = dumps(data, default=str)
                     dtime = 300
-                    info(utoken)
                     self.settings['cache'].set(name=key, value=utoken, ex=dtime)
 
                     vdate = (datetime.now() + timedelta(seconds=dtime)).strftime("%Y/%m/%d")
+                    info(vdate)
                     vtime = (datetime.now() + timedelta(seconds=dtime)).strftime("%H:%M:%S")
+                    info(vtime)
                     code = token_encode(utoken, self.settings['token_secret'][:10])
+                    info(code)
                     code = quote(code, safe='')
+                    info(code)
                     ulink = self.settings['APP_URL'] + '/auth/recovery/' + code
                     info(ulink)
 
@@ -403,6 +405,7 @@ class RecoveryPassword(BaseHandler):
                     toaddr = ouser['email']
 
                     query = {'admin': True, 'email': {'$regex': 'venidera.com', '$options': 'i'}}
+                    info(query)
 
                     bccddrs = yield self.Users.find(query, {'email': 1}).to_list(None)
                     bccddrs = [str(x['email']) for x in bccddrs]
@@ -417,8 +420,11 @@ class RecoveryPassword(BaseHandler):
                         Valid until: %s at %s hours.\n\n
                         Linc Lion Team\n
                     """
-                    message_text = message_text % (remote_ip, ouser['email'], ouser['email'], ulink,
-                                                int(dtime / 60), vdate, vtime)
+                    info(dtime)
+                    info(vdate)
+                    info(vtime)
+
+                    message_text = message_text % (remote_ip, ouser['email'], ulink, int(dtime / 60), vdate, vtime)
 
                     message = "From: %s\r\n" % fromaddr + "To: %s\r\n" % toaddr + "Subject: %s\r\n" % message_subject + "\r\n" + message_text
                     message = message.encode('utf-8')
