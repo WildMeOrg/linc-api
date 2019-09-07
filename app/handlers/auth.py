@@ -328,8 +328,7 @@ class RecoveryPassword(BaseHandler):
                 'title': 'Invalid Request',
                 'message': 'Authentication key is invalid.'
             }
-            # try:
-            if True:
+            try:
                 token = token_decode(code, self.settings['token_secret'][:10])
                 if token:
                     detoken = loads(token)
@@ -363,9 +362,9 @@ class RecoveryPassword(BaseHandler):
                     self.response(400, 'Failed to change password.')
                 else:
                     self.response(400, 'This code is invalid or expired.')
-            # except Exception as e:
-                # info(e)
-                # self.response(400, 'This code is invalid or expired.')
+            except Exception as e:
+                info(e)
+                self.response(400, 'This code is invalid or expired.')
         else:
             self.response(400, 'An code is required to use this resource.')
 
@@ -377,8 +376,7 @@ class RecoveryPassword(BaseHandler):
             password = self.input_data['password']
             ouser = yield self.Users.find_one({'email': email})
             if ouser:
-                # try:
-                if True:
+                try:
                     user_id = str(ouser['_id'])
                     remote_ip = self.request.headers.get("X-Real-IP") or self.request.remote_ip
 
@@ -438,9 +436,9 @@ class RecoveryPassword(BaseHandler):
                     else:
                         self.response(400, 'The system can\'t generate a new password for the user. Ask for support in suporte@venidera.com')
                     return
-                # except Exception as e:
-                    # info(e)
-                    # self.response(400, 'Fail to generate new password.')
+                except Exception as e:
+                    info(e)
+                    self.response(400, 'Fail to generate new password.')
             else:
                 self.response(404, 'No user found with email: %s' % (email))
         else:
