@@ -430,7 +430,8 @@ class RecoveryPassword(BaseHandler):
                     message = "From: %s\r\n" % fromaddr + "To: %s\r\n" % toaddr + "Subject: %s\r\n" % message_subject + "\r\n" + message_text
                     message = message.encode('utf-8')
 
-                    pemail = pemail && yield Task(self.sendEmail, toaddrs, message)
+                    if pemail:
+                        pemail = yield Task(self.sendEmail, toaddrs, message)
 
                     if pemail:
                         self.response(200, 'A new password was sent to the user.')
