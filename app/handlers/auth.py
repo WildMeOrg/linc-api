@@ -377,6 +377,7 @@ class RecoveryPassword(BaseHandler):
             password = self.input_data['password']
             ouser = yield self.Users.find_one({'email': email})
             if ouser:
+                info(ouser)
                 # try:
                 if True:
                     user_id = str(ouser['_id'])
@@ -388,6 +389,7 @@ class RecoveryPassword(BaseHandler):
                             'token': gen_token(6), 'key': hashkey}
                     utoken = dumps(data, default=str)
                     dtime = 300
+                    info(utoken)
                     self.settings['cache'].set(name=key, value=utoken, ex=dtime)
 
                     vdate = (datetime.now() + timedelta(seconds=dtime)).strftime("%Y/%m/%d")
@@ -395,6 +397,7 @@ class RecoveryPassword(BaseHandler):
                     code = token_encode(utoken, self.settings['token_secret'][:10])
                     code = quote(code, safe='')
                     ulink = self.settings['APP_URL'] + '/auth/recovery/' + code
+                    info(ulink)
 
                     fromaddr = self.settings['EMAIL_FROM']
                     toaddr = ouser['email']
@@ -421,6 +424,7 @@ class RecoveryPassword(BaseHandler):
                     message = message.encode('utf-8')
                     toaddrs = [toaddr] + bccddrs
 
+                    info("toaddrs: {} messsage: {}".format(toaddrs, message))
                     pemail = yield Task(self.sendEmail, toaddrs, message)
 
                     if pemail:
