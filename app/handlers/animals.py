@@ -569,7 +569,8 @@ class AnimalsHandler(BaseHandler):
         info(len(ImageSets))
         info(len(Images))
         info(len(objs))
-        for x in objs:
+        for count, x in enumerate(objs):
+            info('%s de %s', count, len(objs))
             obj = dict()
             obj['id'] = x['iid']
             obj['name'] = x['name']
