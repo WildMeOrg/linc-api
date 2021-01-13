@@ -586,10 +586,10 @@ class AnimalsHandler(BaseHandler):
                 obj['dead'] = False
             obj['age'] = None
             obj['gender'] = None
-            ivc = [img for img in ImageSets if (
+            ivc = len([img for img in ImageSets if (
                     img['animal_iid'] == x['iid'] and \
                     not img['is_verified'] and \
-                    img['iid'] != x['primary_image_set_iid'])]
+                    img['iid'] != x['primary_image_set_iid'])])
             if ivc == 0:
                 obj['is_verified'] = True
             else:
