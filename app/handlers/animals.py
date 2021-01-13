@@ -566,6 +566,9 @@ class AnimalsHandler(BaseHandler):
         ImageSets = yield self.ImageSets.find({}).to_list(None)
         Images = yield self.Images.find({}).to_list(None)
         output = list()
+        info(len(ImageSets))
+        info(len(Images))
+        info(len(objs))
         for x in objs:
             obj = dict()
             obj['id'] = x['iid']
