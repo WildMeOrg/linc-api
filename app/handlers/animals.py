@@ -563,7 +563,8 @@ class AnimalsHandler(BaseHandler):
         current_user = yield self.Users.find_one({'email': self.current_user['username']})
         is_admin = current_user['admin']
         current_organization = yield self.db.organizations.find_one({'iid': current_user['organization_iid']})
-
+        Imagesets = yield self.ImageSets.find({}).to_list()
+        Images = yield self.Images.find({}).to_list()
         output = list()
         for x in objs:
             obj = dict()
@@ -582,9 +583,10 @@ class AnimalsHandler(BaseHandler):
                 obj['dead'] = False
             obj['age'] = None
             obj['gender'] = None
-            ivcquery = {'animal_iid': x['iid'], 'is_verified': False,
-                        'iid': {"$ne": x['primary_image_set_iid']}}
-            ivc = yield self.ImageSets.find(ivcquery).count()
+            ivc = [img for img in Imagesets if (
+                    img['animal_iid'] == x['iid'] and \
+                    not img['is_verified'] and \
+                    img['iid'] != x['primary_image_set_iid'])]
             if ivc == 0:
                 obj['is_verified'] = True
             else:
@@ -592,8 +594,8 @@ class AnimalsHandler(BaseHandler):
             obj['thumbnail'] = ''
             obj['image'] = ''
             if x['primary_image_set_iid'] > 0:
-                imgset = yield self.ImageSets.find_one(
-                    {'iid': x['primary_image_set_iid']})
+                imgset = next(iter([imageset for imageset in Imagesets if (
+                    imageset['iid'] == x['primary_image_set_iid'])]))
                 if imgset:
                     if imgset['date_of_birth']:
                         obj['age'] = self.age(imgset['date_of_birth'])
@@ -639,27 +641,19 @@ class AnimalsHandler(BaseHandler):
                         obj['tag_location'] = None
 
                     obj['gender'] = imgset['gender']
-                    # obj['is_verified'] = imgset['is_verified']
-                    img = yield self.Images.find_one(
-                        {'iid': imgset['main_image_iid']})
+                    img = next(iter([image for image in Images if image['iid'] == imgset['main_image_iid']]))
                     if img:
                         obj['thumbnail'] = self.imgurl(img['url'], 'icon') # self.settings['S3_URL'] + img['url'] + '_icon.jpg'
                         obj['image'] = self.imgurl(img['url'], 'medium') # self.settings['S3_URL'] + img['url'] + '_medium.jpg'
             # Check algorithms
-            limagesets = yield self.ImageSets.find({'animal_iid': x['iid']}, {'iid': 1}).to_list(None)
-            limagesets = [x['iid'] for x in limagesets]
+            limagesets = [imageset['iid'] for imageset in ImageSets if imageset['animal_iid'] == x['iid']]
             resp_cv = None
             resp_wh = None
             try:
-                resp_cv = yield self.Images.find(
-                    {'image_tags': ['cv'],
-                        'image_set_iid': {'$in': limagesets}}).count()
-                resp_wh = yield self.Images.find(
-                    {'$or': [
-                        # {'image_tags': ['whisker']},
-                        {'image_tags': ['whisker-left']},
-                        {'image_tags': ['whisker-right']}],
-                     'image_set_iid': {'$in': limagesets}}).count()
+                resp_cv = len([image for image in Images if image['image_tags'] == ['cv']])
+                resp_wh = len([image for image in Images if (
+                    image['image_tags'] == ['whisker'] or image['image_tags'] == ['whisker-left'] or \
+                    image['image_tags'] == ['whisker-right'] or image['image_set_iid'] in limagesets)])
             except Exception as e:
                 info(e)
             obj['cv'] = bool(resp_cv)
