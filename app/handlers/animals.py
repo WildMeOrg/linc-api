@@ -594,9 +594,12 @@ class AnimalsHandler(BaseHandler):
             obj['thumbnail'] = ''
             obj['image'] = ''
             if x['primary_image_set_iid'] > 0:
-                imgset = next(iter([imageset for imageset in ImageSets if (
-                    imageset['iid'] == x['primary_image_set_iid'])]))
+                # imgset = next(iter([imageset for imageset in ImageSets if (
+                #     imageset['iid'] == x['primary_image_set_iid'])]))
+                imgset = [imageset for imageset in ImageSets if (
+                    imageset['iid'] == x['primary_image_set_iid'])]
                 if imgset:
+                    imgset = imgset[0]
                     if imgset['date_of_birth']:
                         obj['age'] = self.age(imgset['date_of_birth'])
                         obj['date_of_birth'] = imgset['date_of_birth'].date().isoformat()
@@ -641,8 +644,10 @@ class AnimalsHandler(BaseHandler):
                         obj['tag_location'] = None
 
                     obj['gender'] = imgset['gender']
-                    img = next(iter([image for image in Images if image['iid'] == imgset['main_image_iid']]))
+                    # img = next(iter([image for image in Images if image['iid'] == imgset['main_image_iid']]))
+                    img = [image for image in Images if image['iid'] == imgset['main_image_iid']]
                     if img:
+                        img = img[0]
                         obj['thumbnail'] = self.imgurl(img['url'], 'icon') # self.settings['S3_URL'] + img['url'] + '_icon.jpg'
                         obj['image'] = self.imgurl(img['url'], 'medium') # self.settings['S3_URL'] + img['url'] + '_medium.jpg'
             # Check algorithms
