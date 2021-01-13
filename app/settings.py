@@ -85,7 +85,8 @@ if URI == "local":
     db = conn['linc-api-' + api['animals']]
     sdb = pm['linc-api-' + api['animals']]
 else:
-    dbname = URI.split("://")[1].split(":")[0]
+    # dbname = URI.split("://")[1].split(":")[0]
+    dbname = URI.split("/")[-1].split("?")[0]
     conn = connect(URI)
     pm = MongoClient(URI)
     db = conn[dbname]

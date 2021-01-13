@@ -58,9 +58,6 @@ class BaseHandler(RequestHandler, DBMethods, HTTPMethods):
         self.CVRequests = self.settings['db'].cvrequests
         self.CVResults = self.settings['db'].cvresults
         self.cache = self.settings['cache']
-
-        users = Images = yield self.Users.find({}).to_list(None)
-        info(users)
         # Creating remote s3 instance
         self.remote = RemoteS3Files({
             'access_key': self.settings['S3_ACCESS_KEY'],
