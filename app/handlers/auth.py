@@ -71,6 +71,8 @@ class LoginHandler(BaseHandler):
             info(count)
             ouser = yield Task(self.get_user_by_email, username)
             info(ouser)
+            ouser = yield self.Users.find_one({'email': username})
+            info(ouser)
             if username in wlist.keys():
                 dt = wlist[username]
                 if datetime.now() < dt + timedelta(minutes=30):
