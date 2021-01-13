@@ -563,7 +563,7 @@ class AnimalsHandler(BaseHandler):
         current_user = yield self.Users.find_one({'email': self.current_user['username']})
         is_admin = current_user['admin']
         current_organization = yield self.db.organizations.find_one({'iid': current_user['organization_iid']})
-        Imagesets = yield self.ImageSets.find({}).to_list(None)
+        ImageSets = yield self.ImageSets.find({}).to_list(None)
         Images = yield self.Images.find({}).to_list(None)
         output = list()
         for x in objs:
@@ -583,7 +583,7 @@ class AnimalsHandler(BaseHandler):
                 obj['dead'] = False
             obj['age'] = None
             obj['gender'] = None
-            ivc = [img for img in Imagesets if (
+            ivc = [img for img in ImageSets if (
                     img['animal_iid'] == x['iid'] and \
                     not img['is_verified'] and \
                     img['iid'] != x['primary_image_set_iid'])]
@@ -594,7 +594,7 @@ class AnimalsHandler(BaseHandler):
             obj['thumbnail'] = ''
             obj['image'] = ''
             if x['primary_image_set_iid'] > 0:
-                imgset = next(iter([imageset for imageset in Imagesets if (
+                imgset = next(iter([imageset for imageset in ImageSets if (
                     imageset['iid'] == x['primary_image_set_iid'])]))
                 if imgset:
                     if imgset['date_of_birth']:
