@@ -563,8 +563,8 @@ class AnimalsHandler(BaseHandler):
         current_user = yield self.Users.find_one({'email': self.current_user['username']})
         is_admin = current_user['admin']
         current_organization = yield self.db.organizations.find_one({'iid': current_user['organization_iid']})
-        Imagesets = yield self.ImageSets.find({}).to_list()
-        Images = yield self.Images.find({}).to_list()
+        Imagesets = yield self.ImageSets.find({}).to_list(None)
+        Images = yield self.Images.find({}).to_list(None)
         output = list()
         for x in objs:
             obj = dict()
